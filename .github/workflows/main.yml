@@ -1,0 +1,71 @@
+name: Daily Stock Analysis
+
+on:
+  schedule:
+    # UTC 時間 08:00 相當於 UTC+8 (東八區) 16:00
+    # 設置在週一至週五股市收盤後自動執行
+    - cron: '0 8 * * 1-5'
+  
+  # 允許在 GitHub 頁面的 Actions 標籤頁手動點擊「Run workflow」觸發
+  workflow_dispatch:
+
+jobs:
+  run-daily-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: 檢出倉庫代碼
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: 設定 Python 執行環境
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      # Step 3: 安裝項目依賴
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      # Step 4: 執行 AI 股票分析主腳本
+      - name: Run Stock Analysis
+        env:
+          # AI 模型 API Key (依你使用的大模型挑選填寫)
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          
+          # 股票代碼清單 (例: 600519,hk00700,AAPL,NVDA)
+          STOCK_LIST: ${{ secrets.STOCK_LIST }}
+          
+          # 國內/原生微信推送 (Server 醬/SC3 專用)
+          PUSH_KEY: ${{ secrets.PUSH_KEY }}
+          SERVERCHAN_SENDKEY: ${{ secrets.PUSH_KEY }}
+          
+          # Telegram 推送變數 (若項目原生支持可直接調用)
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python main.py --stocks secrets.STOCK_LIST
+
+      # Step 5: (可選) 若項目本身沒有集成 Telegram 推送，此步驟會自動將輸出的報告送至 Telegram
+      - name: Send Report to Telegram (Fallback)
+        if: success() && env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != ''
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          # 檢查是否有生成 Markdown 報告檔案 (請根據項目實際產出的檔名調整，如 output.md 或 result.md)
+          if [ -f "result.md" ]; then
+            REPORT_CONTENT=$(cat result.md)
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "text=${REPORT_CONTENT}" \
+              -d "parse_mode=Markdown"
+          else
+            echo "未找到預期的報告 Markdown 文件，跳過自動轉發。"
+          fi
