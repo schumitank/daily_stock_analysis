@@ -50,7 +50,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python main.py --stocks 5802.T,8001.T,8053.T
+          python main.py --stocks 8001.T,6701.T,7974.T
 
       # Step 5: (可選) 若項目本身沒有集成 Telegram 推送，此步驟會自動將輸出的報告送至 Telegram
       - name: Send Report to Telegram (Fallback)
