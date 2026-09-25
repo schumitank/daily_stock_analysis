@@ -175,6 +175,8 @@ STOCK_ENGLISH_NAME_MAP: Dict[str, Tuple[str, ...]] = {
     "01299": ("AIA Group", "AIA"),
     "00941": ("China Mobile",),
     "00883": ("CNOOC",),
+    # === Japan stocks ===
+    "5802.T": ("Sumitomo Electric Industries", "Sumitomo Electric"),
 }
 
 
