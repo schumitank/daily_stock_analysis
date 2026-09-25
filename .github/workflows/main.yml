@@ -47,7 +47,7 @@ jobs:
           SERVERCHAN_SENDKEY: ${{ secrets.PUSH_KEY }}
 
           # News search (tavily)
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          TAVILY_API_KEYS: ${{ secrets.TAVILY_API_KEY }}
           
           # Telegram 推送變數 (若項目原生支持可直接調用)
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
