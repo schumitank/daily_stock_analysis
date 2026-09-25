@@ -4488,8 +4488,8 @@ class SearchService:
                         f"{stock_name} {stock_code} 公告 指数调整 成分变化"
                         if is_index_etf
                         else (
-                            f"{stock_name} {stock_code} "
-                            f"公司公告 重要公告 JPX TDnet 东京证券交易所"
+                            f"{stock_name} {stock_code.replace('.T', '')} "
+                            f"適時開示 TDnet 決算 配当 自己株式"
                             if str(stock_code).upper().endswith(".T")
                             else f"{stock_name} {stock_code} 公司公告 重要公告 上交所 深交所 cninfo"
                         )
