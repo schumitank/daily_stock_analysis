@@ -2296,8 +2296,12 @@ class SearchService:
         "interest rate", "nasdaq", "s&p 500", "dow jones",
     )
     _OFFICIAL_SOURCE_TERMS = (
-        "cninfo", "sse.com", "szse.cn", "hkexnews", "sec.gov", "nasdaq.com",
-        "nyse.com", "上交所", "深交所", "港交所", "证券交易所",
+        "cninfo", "sse.com", "szse.cn", "hkexnews",
+        "sec.gov", "nasdaq.com", "nyse.com",
+        "jpx.co.jp", "tdnet", "edinet",
+        "上交所", "深交所", "港交所",
+        "东京证券交易所", "日本交易所",
+        "证券交易所",
     )
     _OFFICIAL_SOURCE_HOSTS = (
         "cninfo.com.cn", "sse.com", "sse.com.cn", "szse.cn", "hkexnews.hk",
@@ -2306,7 +2310,10 @@ class SearchService:
     _OFFICIAL_SOURCE_LABELS = (
         "cninfo", "hkexnews", "巨潮资讯", "巨潮资讯网",
         "上交所", "深交所", "港交所", "证券交易所",
-        "上海证券交易所", "深圳证券交易所", "香港交易所", "香港联合交易所",
+        "上海证券交易所", "深圳证券交易所",
+        "香港交易所", "香港联合交易所",
+        "JPX", "TDnet", "EDINET",
+        "东京证券交易所", "日本交易所",
     )
     _LOW_QUALITY_DOWNLOAD_ACTION_TERMS = (
         "下载", "安装", "下载安装", "下载安装到手机", "下载链接",
@@ -4479,7 +4486,13 @@ class SearchService:
                     'name': 'announcements',
                     'query': (
                         f"{stock_name} {stock_code} 公告 指数调整 成分变化"
-                        if is_index_etf else f"{stock_name} {stock_code} 公司公告 重要公告 上交所 深交所 cninfo"
+                        if is_index_etf
+                        else (
+                            f"{stock_name} {stock_code} "
+                            f"公司公告 重要公告 JPX TDnet 东京证券交易所"
+                            if str(stock_code).upper().endswith(".T")
+                            else f"{stock_name} {stock_code} 公司公告 重要公告 上交所 深交所 cninfo"
+                        )
                     ),
                     'desc': '公司公告',
                     'tavily_topic': 'news',
